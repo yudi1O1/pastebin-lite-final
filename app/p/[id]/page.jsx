@@ -2,6 +2,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+
+if (!data) {
+  notFound();
+}
+
 
 async function getPaste(id) {
   const headersList = headers();
