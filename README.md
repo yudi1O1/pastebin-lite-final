@@ -18,3 +18,9 @@ A minimal Pastebin-like application built with Next.js and Redis.
 ```bash
 npm install
 npm run dev
+
+## -----------------Final submission--------------------------
+
+GitHub Repo: https://github.com/yudi1O1/pastebin-lite-final
+Live App: https://pastebin-lite-final-rho.vercel.app
+Health Check: https://pastebin-lite-final-rho.vercel.app/api/healthz 
