@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { redis } from "../../../lib/redis.js";
-import { getNow } from "../../../lib/time.js";
+import { redis } from "../../../../lib/redis.js";
+import { getNow } from "../../../../lib/time.js";
 
 export async function GET(req, { params }) {
   const paste = await redis.get(`paste:${params.id}`);
@@ -19,14 +19,8 @@ export async function GET(req, { params }) {
   }
 
   // View limit check
-  if (
-    paste.max_views !== null &&
-    paste.views >= paste.max_views
-  ) {
-    return Response.json(
-      { error: "View limit exceeded" },
-      { status: 404 }
-    );
+  if (paste.max_views !== null && paste.views >= paste.max_views) {
+    return Response.json({ error: "View limit exceeded" }, { status: 404 });
   }
 
   // Increment views
@@ -36,9 +30,7 @@ export async function GET(req, { params }) {
   return Response.json({
     content: paste.content,
     remaining_views:
-      paste.max_views === null
-        ? null
-        : paste.max_views - paste.views,
+      paste.max_views === null ? null : paste.max_views - paste.views,
     expires_at: paste.expires_at
       ? new Date(paste.expires_at).toISOString()
       : null,
