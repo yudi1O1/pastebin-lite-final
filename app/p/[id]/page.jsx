@@ -4,11 +4,6 @@ export const runtime = "nodejs";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
-if (!data) {
-  notFound();
-}
-
-
 async function getPaste(id) {
   const headersList = headers();
   const host = headersList.get("host");
@@ -21,22 +16,26 @@ async function getPaste(id) {
     { cache: "no-store" }
   );
 
-  if (!res.ok) return null;
+  if (!res.ok) {
+    return null;
+  }
+
   return res.json();
 }
 
 export default async function PastePage({ params }) {
-  const data = await getPaste(params.id);
+  const paste = await getPaste(params.id);
 
-  if (!data) {
-    return <h1>404 – Paste not found</h1>;
+  
+  if (!paste) {
+    notFound();
   }
 
   return (
     <main style={{ maxWidth: 600, margin: "40px auto" }}>
       <h2>Paste</h2>
       <pre style={{ whiteSpace: "pre-wrap" }}>
-        {data.content}
+        {paste.content}
       </pre>
     </main>
   );
