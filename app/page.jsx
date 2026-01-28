@@ -8,9 +8,11 @@ export default function Home() {
   const [maxViews, setMaxViews] = useState("");
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   async function createPaste() {
     setLoading(true);
+    setCopied(false);
     setUrl("");
 
     const payload = {
@@ -28,6 +30,12 @@ export default function Home() {
     const data = await res.json();
     setUrl(data.url);
     setLoading(false);
+  }
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -65,11 +73,19 @@ export default function Home() {
         {loading ? "Creating..." : "Create Paste"}
       </button>
 
-      {/* Result URL */}
+      {/* Result */}
       {url && (
-        <p style={{ marginTop: 16 }}>
-          🔗 <a href={url}>{url}</a>
-        </p>
+        <div style={{ marginTop: 16 }}>
+          <p>
+            🔗 <a href={url}>{url}</a>
+          </p>
+
+          <button onClick={copyToClipboard}>📋 Copy URL</button>
+
+          {copied && (
+            <span style={{ marginLeft: 8, color: "green" }}>Copied!</span>
+          )}
+        </div>
       )}
     </main>
   );
