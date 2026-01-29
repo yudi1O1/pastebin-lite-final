@@ -1,38 +1,55 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { redis } from "../../../../lib/redis.js";
-import { getNow } from "../../../../lib/time.js";
+import { redis } from "../../../lib/redis";
+import { getNow } from "../../../lib/time";
 
 export async function GET(req, { params }) {
-  const paste = await redis.get(`paste:${params.id}`);
+  const key = `paste:${params.id}`;
+  const paste = await redis.get(key);
 
+  // 1️⃣ Not found
   if (!paste) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
   const now = getNow(req);
 
-  // TTL check
+  // 2️⃣ TTL expired → delete
   if (paste.expires_at && now >= paste.expires_at) {
+    await redis.del(key);
     return Response.json({ error: "Expired" }, { status: 404 });
   }
 
-  // View limit check
-  if (paste.max_views !== null && paste.views >= paste.max_views) {
-    return Response.json({ error: "View limit exceeded" }, { status: 404 });
+  // 3️⃣ View limit exceeded → delete
+  if (
+    paste.max_views !== null &&
+    paste.views >= paste.max_views
+  ) {
+    await redis.del(key);
+    return Response.json(
+      { error: "View limit exceeded" },
+      { status: 404 }
+    );
   }
 
-  // Increment views
-  paste.views += 1;
-  await redis.set(`paste:${params.id}`, paste);
+  // 4️⃣ Increment views BEFORE returning
+  const updatedPaste = {
+    ...paste,
+    views: paste.views + 1,
+  };
 
+  await redis.set(key, updatedPaste);
+
+  // 5️⃣ Return clean response
   return Response.json({
-    content: paste.content,
+    content: updatedPaste.content,
     remaining_views:
-      paste.max_views === null ? null : paste.max_views - paste.views,
-    expires_at: paste.expires_at
-      ? new Date(paste.expires_at).toISOString()
+      updatedPaste.max_views === null
+        ? null
+        : updatedPaste.max_views - updatedPaste.views,
+    expires_at: updatedPaste.expires_at
+      ? new Date(updatedPaste.expires_at).toISOString()
       : null,
   });
 }
