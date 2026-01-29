@@ -112,7 +112,10 @@ export default function Home() {
       {url && (
         <div style={{ marginTop: 16 }}>
           <p>
-            🔗 <a href={url}>{url}</a>
+            🔗{" "}
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {url}
+            </a>
           </p>
 
           <button onClick={copyToClipboard}>📋 Copy URL</button>
