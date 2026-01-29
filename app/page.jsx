@@ -9,11 +9,12 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function createPaste() {
     setLoading(true);
     setCopied(false);
-    setUrl("");
+    setMessage("");
 
     const payload = {
       content,
@@ -28,8 +29,26 @@ export default function Home() {
     });
 
     const data = await res.json();
+
+    // 🔥 Reset form
+    setContent("");
+    setTtl("");
+    setMaxViews("");
+
+    // 🔥 Show result
     setUrl(data.url);
+
+    // 🔥 Popup message
+    const ttlMsg = ttl ? `expires in ${ttl} seconds` : "no expiry";
+
+    const viewsMsg = maxViews ? `${maxViews} max views` : "unlimited views";
+
+    setMessage(`Paste created • ${ttlMsg} • ${viewsMsg}`);
+
     setLoading(false);
+
+    // Auto-hide message
+    setTimeout(() => setMessage(""), 4000);
   }
 
   function copyToClipboard() {
@@ -41,6 +60,22 @@ export default function Home() {
   return (
     <main style={{ maxWidth: 600, margin: "40px auto" }}>
       <h2>Pastebin Lite</h2>
+
+      {/* Popup message */}
+      {message && (
+        <div
+          style={{
+            background: "#e6fffa",
+            border: "1px solid #38b2ac",
+            padding: "8px 12px",
+            marginBottom: 12,
+            borderRadius: 4,
+            color: "#065f46",
+          }}
+        >
+          {message}
+        </div>
+      )}
 
       {/* Paste content */}
       <textarea
