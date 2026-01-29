@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { redis } from "../../../lib/redis";
-import { getNow } from "../../../lib/time";
+import { redis } from "../../../../lib/redis.js";
+import { getNow } from "../../../../lib/time.js";
 
 export async function GET(req, { params }) {
   const key = `paste:${params.id}`;
